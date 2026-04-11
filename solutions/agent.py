@@ -95,7 +95,7 @@ def create_agent() -> LlmAgent:
     # IMPORTANT: Callbacks are passed directly to LlmAgent (not via plugins)
     # This ensures they work with `adk web` for local testing
     agent = LlmAgent(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         name="customer_service_agent",
         instruction=get_agent_instructions(),
         tools=[bigquery_tools],
