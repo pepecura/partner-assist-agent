@@ -1,3 +1,11 @@
+### Original repo and codelab by ayoisio:
+https://codelabs.developers.google.com/secure-customer-service-agent/instructions </br>
+### Updates by pepecura:
+- The content changed from customer service to partner service for a demo story by just updating the instructions.
+- The packages in requirements.txt updated.
+- The agent identity roles in deploy.py updated. 
+
+
 # 🛡️ Build a Secure Agent with Model Armor and Identity
 
 ![Secure Customer Service Agent Architecture](img/01-01-architecture.png)
