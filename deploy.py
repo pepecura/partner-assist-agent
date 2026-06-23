@@ -68,6 +68,7 @@ if errors:
 
 print(f"   ✓ PROJECT_ID: {PROJECT_ID}")
 print(f"   ✓ LOCATION: {LOCATION}")
+print(f"   ✓ AGENT_ENGINE_ID: {AGENT_ENGINE_ID}")
 print(f"   ✓ STAGING_BUCKET: gs://{STAGING_BUCKET}")
 print(f"   ✓ TEMPLATE_NAME: {TEMPLATE_NAME}")
 print()
@@ -88,6 +89,9 @@ env_content = f"""# Runtime environment variables for Agent Engine
 GOOGLE_CLOUD_PROJECT={PROJECT_ID}
 GOOGLE_CLOUD_LOCATION={LOCATION}
 TEMPLATE_NAME={TEMPLATE_NAME}
+GOOGLE_API_PREVENT_AGENT_TOKEN_SHARING_FOR_GCP_SERVICES=False
+GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY=True
+OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=True
 """
 
 with open(env_file_path, "w") as f:
@@ -167,7 +171,7 @@ if not agent_engine_id:
             remote_app = client.agent_engines.create(
                 config={
                     "identity_type": types.IdentityType.AGENT_IDENTITY,
-                    "display_name": "Secure Customer Service Agent",
+                    "display_name": "Secure Customer Service Agent"
                 }
             )
         finally:
@@ -259,7 +263,9 @@ try:
             ["gcloud", "projects", "describe", PROJECT_ID, "--format=value(projectNumber)"],
             capture_output=True, text=True, timeout=30
         )
+        
         project_number = result.stdout.strip()
+        print(f"Project id for agent identity IAM binding: {project_number}")
 
         if org_id:
             agent_identity = f"principal://agents.global.org-{org_id}.system.id.goog/resources/aiplatform/projects/{project_number}/locations/{LOCATION}/reasoningEngines/{agent_engine_id}"
@@ -273,8 +279,10 @@ try:
     # Required baseline roles for Agent Identity
     baseline_roles = [
         ("roles/serviceusage.serviceUsageConsumer", "Service Usage Consumer (required for agent startup)"),
+        ("roles/aiplatform.user", "AI Platform User (for Vertex AI services, including Sessions)"), # added this line.
         ("roles/aiplatform.expressUser", "AI Platform Express User (required for inference)"),
         ("roles/browser", "Browser (required for project metadata access)"),
+        ("roles/bigquery.dataViewer", "BigQuery data viewer role (required for viewing BQ tables)"), #this needs to be added, missing in the codelab.
         ("roles/modelarmor.user", "Model Armor User (required for input/output sanitization)"),
         ("roles/mcp.toolUser", "MCP Tool User (required for OneMCP BigQuery access)"),
         ("roles/bigquery.jobUser", "BigQuery Job User (required for running queries)"),
@@ -290,15 +298,16 @@ try:
             "gcloud", "projects", "add-iam-policy-binding", PROJECT_ID,
             f"--member={agent_identity}",
             f"--role={role}",
-            "--condition=None",
-            "--quiet"
+            "--condition=None"
         ]
+
+        print(f" Executing iam policy binding: {' '.join(grant_cmd)}")
 
         result = subprocess.run(
             grant_cmd,
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=90
         )
 
         if result.returncode != 0:
@@ -329,10 +338,10 @@ try:
             print(f"   ✓ Granted {role}")
 
     print()
-    print("   ⏳ Waiting 30 seconds for IAM propagation...")
+    print("   ⏳ Waiting 90 seconds for IAM propagation...")
     import time
 
-    time.sleep(30)
+    time.sleep(90)
     print("   ✓ IAM permissions configured")
     print()
 
@@ -355,14 +364,10 @@ cmd = [
     "adk", "deploy", "agent_engine",
     "--project", PROJECT_ID,
     "--region", LOCATION,
-    "--staging_bucket", f"gs://{STAGING_BUCKET}",
-    "--trace_to_cloud",
-    "--env_file", env_file_path,
-    "--agent_engine_id", agent_engine_id,  # Always update the instance we created/have
+    "--otel_to_cloud",
+    "--agent_engine_id", agent_engine_id,
+     "agent"
 ]
-
-# Add the agent module (the 'agent' directory)
-cmd.append("agent")
 
 print(f"   → Deploying code to Agent Engine: {agent_engine_id}")
 print(f"   Command: {' '.join(cmd)}")

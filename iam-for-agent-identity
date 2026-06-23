@@ -1,0 +1,42 @@
+# Principal to grant roles to
+PROJECT_NUMBER=108525214404
+PRINCIPAL="principal://agents.global.org-680181529320.system.id.goog/resources/aiplatform/projects/$PROJECT_NUMBER/locations/us-central1/reasoningEngines/5217743974483099648"
+PROJECT_ID="ai-london"
+
+# Agent Platform Roles
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/aiplatform.expressUser' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/aiplatform.sessionEditor' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/aiplatform.user' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/aiplatform.editor' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/aiplatform.agentDefaultAccess' --member="${PRINCIPAL}"
+
+# BigQuery Roles
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/bigquery.dataViewer' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/bigquery.jobUser' --member="${PRINCIPAL}"
+
+# General Roles
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/browser' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/serviceusage.serviceUsageConsumer' --member="${PRINCIPAL}"
+
+# Cloud Trace Roles
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/cloudtrace.agent' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/cloudtrace.user' --member="${PRINCIPAL}"
+
+# Logging Roles
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/logging.viewer' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/logging.logWriter' --member="${PRINCIPAL}"
+
+# MCP Role (Uncertain)
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/aiplatform.toolUser' --member="${PRINCIPAL}"
+
+# Model Armor Role
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/modelarmor.user' --member="${PRINCIPAL}"
+
+# Monitoring Role
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/monitoring.metricWriter' --member="${PRINCIPAL}"
+
+# Storage Roles
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/storage.admin' --member="${PRINCIPAL}"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role='roles/storage.objectUser' --member="${PRINCIPAL}"
+
+echo "IAM role bindings complete."

@@ -1,6 +1,6 @@
 """
 =============================================================================
-Model Armor Guard for ADK
+Model Armor Guard for ADK - SOLUTION
 =============================================================================
 This module provides Model Armor integration via agent-level callbacks.
 
@@ -13,9 +13,6 @@ Security protections:
 - Sensitive data protection (SSN, credit cards, API keys)
 - Harmful content filtering (harassment, hate speech, dangerous)
 - Malicious URL detection
-
-=============================================================================
-YOUR TASK: Implement the placeholder sections marked with TODO
 =============================================================================
 """
 
@@ -69,16 +66,24 @@ class ModelArmorGuard:
         self.template_name = template_name
         self.location = location
         self.block_on_match = block_on_match
+        self._client: Optional[modelarmor_v1.ModelArmorClient] = None
+        self._client_options = ClientOptions(
+            api_endpoint=f"modelarmor.{location}.rep.googleapis.com"
+        )
 
-        # =================================================================
-        # TODO 1: Initialize the Model Armor client
-        # =================================================================
-        # Create a ModelArmorClient using the REST transport
-        # =================================================================
+        print(f"[ModelArmorGuard] ✅ Configured with template: {template_name}")
 
-        self.client = None  # PLACEHOLDER - Replace with your implementation
-
-        print(f"[ModelArmorGuard] ✅ Initialized with template: {template_name}")
+    @property
+    def client(self) -> modelarmor_v1.ModelArmorClient:
+        """Lazy load the Model Armor client on first use."""
+        if self._client is None:
+            print("[ModelArmorGuard] Initializing ModelArmorClient...")
+            self._client = modelarmor_v1.ModelArmorClient(
+                transport="rest",
+                client_options=self._client_options,
+            )
+            print("[ModelArmorGuard] ✅ ModelArmorClient Initialized")
+        return self._client
 
     def _get_matched_filters(self, result) -> list[str]:
         """
@@ -200,36 +205,57 @@ class ModelArmorGuard:
             None: Allow the request to proceed to the LLM
             LlmResponse: Block the request and return this response instead
         """
-        # =================================================================
-        # TODO 2: Extract user text from the request
-        # =================================================================
-        # Use self._extract_user_text() to get the user's message
-        # If empty, return None to allow the request through
-        # =================================================================
-
-        user_text = ""  # PLACEHOLDER - Replace with your implementation
+        user_text = self._extract_user_text(llm_request)
+        if not user_text:
+            return None
 
         print(f"[ModelArmorGuard] 🔍 Screening user prompt: '{user_text[:80]}...'")
 
         try:
-            # =================================================================
-            # TODO 3: Call Model Armor to sanitize the user prompt
-            # =================================================================
-            # Create a SanitizeUserPromptRequest and call the API
-            # =================================================================
+            sanitize_request = modelarmor_v1.SanitizeUserPromptRequest(
+                name=self.template_name,
+                user_prompt_data=modelarmor_v1.DataItem(text=user_text),
+            )
+            # Access client via property to trigger lazy loading
+            result = self.client.sanitize_user_prompt(request=sanitize_request)
 
-            result = None  # PLACEHOLDER - Replace with your implementation
+            matched_filters = self._get_matched_filters(result)
 
-            # =================================================================
-            # TODO 4: Check for matched filters and block if needed
-            # =================================================================
-            # Use self._get_matched_filters(result) to check for threats
-            # If threats found and self.block_on_match is True:
-            #   - Log the blocked filters
-            #   - Return an LlmResponse with a user-friendly message
-            # =================================================================
+            if matched_filters and self.block_on_match:
+                print(f"[ModelArmorGuard] 🛡️ BLOCKED - Threats detected: {matched_filters}")
 
-            pass  # PLACEHOLDER - Replace with your implementation
+                # Create user-friendly message based on threat type
+                if 'pi_and_jailbreak' in matched_filters:
+                    message = (
+                        "I apologize, but I cannot process this request. "
+                        "Your message appears to contain instructions that could "
+                        "compromise my safety guidelines. Please rephrase your question."
+                    )
+                elif 'sdp' in matched_filters:
+                    message = (
+                        "I noticed your message contains sensitive personal information "
+                        "(like SSN or credit card numbers). For your security, I cannot "
+                        "process requests containing such data. Please remove the sensitive "
+                        "information and try again."
+                    )
+                elif any(f.startswith('rai') for f in matched_filters):
+                    message = (
+                        "I apologize, but I cannot respond to this type of request. "
+                        "Please rephrase your question in a respectful manner, and "
+                        "I'll be happy to help."
+                    )
+                else:
+                    message = (
+                        "I apologize, but I cannot process this request due to "
+                        "security concerns. Please rephrase your question."
+                    )
+
+                return LlmResponse(
+                    content=types.Content(
+                        role="model",
+                        parts=[types.Part.from_text(text=message)]
+                    )
+                )
 
             print(f"[ModelArmorGuard] ✅ User prompt passed security screening")
 
@@ -260,34 +286,37 @@ class ModelArmorGuard:
             None: Allow the response to return to the user
             LlmResponse: Replace the response with this sanitized version
         """
-        # =================================================================
-        # TODO 5: Extract model text from the response
-        # =================================================================
-        # Use self._extract_model_text() to get the model's response
-        # If empty, return None to allow the response through
-        # =================================================================
-
-        model_text = ""  # PLACEHOLDER - Replace with your implementation
+        model_text = self._extract_model_text(llm_response)
+        if not model_text:
+            return None
 
         print(f"[ModelArmorGuard] 🔍 Screening model response: '{model_text[:80]}...'")
 
         try:
-            # =================================================================
-            # TODO 6: Call Model Armor to sanitize the model response
-            # =================================================================
-            # Create a SanitizeModelResponseRequest and call the API
-            # =================================================================
+            sanitize_request = modelarmor_v1.SanitizeModelResponseRequest(
+                name=self.template_name,
+                model_response_data=modelarmor_v1.DataItem(text=model_text),
+            )
+            # Access client via property to trigger lazy loading
+            result = self.client.sanitize_model_response(request=sanitize_request)
 
-            result = None  # PLACEHOLDER - Replace with your implementation
+            matched_filters = self._get_matched_filters(result)
 
-            # =================================================================
-            # TODO 7: Check for matched filters and sanitize if needed
-            # =================================================================
-            # Similar to TODO 4, but for model responses
-            # If threats found, return a sanitized response
-            # =================================================================
+            if matched_filters and self.block_on_match:
+                print(f"[ModelArmorGuard] 🛡️ Response sanitized - Issues detected: {matched_filters}")
 
-            pass  # PLACEHOLDER - Replace with your implementation
+                message = (
+                    "I apologize, but my response was filtered for security reasons. "
+                    "Could you please rephrase your question? I'm here to help with "
+                    "your customer service needs."
+                )
+
+                return LlmResponse(
+                    content=types.Content(
+                        role="model",
+                        parts=[types.Part.from_text(text=message)]
+                    )
+                )
 
             print(f"[ModelArmorGuard] ✅ Model response passed security screening")
 

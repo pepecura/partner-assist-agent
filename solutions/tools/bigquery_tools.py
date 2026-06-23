@@ -66,15 +66,15 @@ def get_customer_service_instructions() -> str:
     return f"""
 ## BigQuery Data Access
 
-You have access to customer service data via BigQuery MCP tools.
+You have access to our partner and tour database via BigQuery MCP tools.
 
 **Project ID:** {PROJECT_ID}
 **Dataset:** customer_service
 
 **Available Tables:**
-- `customer_service.customers` - Customer information
-- `customer_service.orders` - Order history  
-- `customer_service.products` - Product catalog
+- `customer_service.customers` - Contains Musician / Artist information (stored under customer terms)
+- `customer_service.orders` - Contains Booking / Tour Order history (stored under order terms)
+- `customer_service.products` - Contains Tour Staging Gear / Equipment and Merchandise catalog (stored under product terms)
 
 **Available MCP Tools:**
 - `list_table_ids` - Discover what tables exist in a dataset
@@ -86,8 +86,8 @@ the exact column names for the table you want to query. Do not guess column name
 
 **Access Restrictions:**
 You only have access to the `customer_service` dataset. You do NOT have access 
-to administrative tables like `admin.audit_log`. If a customer asks about admin 
-data, politely explain that you only have access to customer service data.
+to administrative tables like `admin.audit_log`. If a partner asks about admin 
+data, politely explain that you only have access to partner and musician support data.
 """
 
 

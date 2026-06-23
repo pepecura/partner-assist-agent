@@ -1,19 +1,17 @@
-# =============================================================================
-# Secure Customer Service Agent - Runtime Dependencies
-# =============================================================================
-# These are the dependencies needed when the agent runs in Agent Engine
-
-# ADK framework
-google-adk==1.21.0
-
-# Model Armor for security
+# Requirements
+google-adk==2.2.0
 google-cloud-modelarmor==0.3.0
-
-# BigQuery for data access
 google-cloud-bigquery==3.39.0
+google-auth>=2.47
+google-cloud-aiplatform==1.157.0
+mcp==1.27.2
+google-genai==2.4
+google-cloud-storage==3.11.0
+google-cloud-trace==1.19.0
+google-adk[a2a]
+opentelemetry-instrumentation-google-genai>=0.4b0
+opentelemetry-exporter-gcp-logging
+opentelemetry-exporter-otlp-proto-http
+opentelemetry-instrumentation-vertexai>=2.0b0
+pyOpenSSL<26.0  
 
-# Auth
-google-auth==2.45.0
-
-# Vertex AI for Agent Engine
-google-cloud-aiplatform==1.132.0

@@ -1,0 +1,38 @@
+{
+  "access": [
+    {
+      "role": "WRITER",
+      "specialGroup": "projectWriters"
+    },
+    {
+      "role": "OWNER",
+      "specialGroup": "projectOwners"
+    },
+    {
+      "role": "OWNER",
+      "userByEmail": "tuba@tubaislam.altostrat.com"
+    },
+    {
+      "role": "READER",
+      "specialGroup": "projectReaders"
+    },
+    {
+      "role": "roles/bigquery.dataViewer",
+      "iamMember": "principal://agents.global.org-680181529320.system.id.goog/resources/aiplatform/projects/108525214404/locations/us-central1/reasoningEngines/4697613401893896192"
+    }
+  ],
+  "creationTime": "1780872801904",
+  "datasetReference": {
+    "datasetId": "customer_service",
+    "projectId": "ai-london"
+  },
+  "description": "Customer service data - accessible by the agent",
+  "etag": "sbirkC2X+11FpKyLDHyYuw==",
+  "id": "ai-london:customer_service",
+  "kind": "bigquery#dataset",
+  "lastModifiedTime": "1780872801904",
+  "location": "US",
+  "maxTimeTravelHours": "168",
+  "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/ai-london/datasets/customer_service",
+  "type": "DEFAULT"
+}
