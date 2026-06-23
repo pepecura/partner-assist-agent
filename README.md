@@ -5,10 +5,10 @@ https://codelabs.developers.google.com/secure-customer-service-agent/instruction
 - The packages in requirements.txt updated.
 - The agent identity roles in deploy.py updated.
 - Demo video links:
-![Sonic Agent](https://youtu.be/pTaZZsaGW5E)
-![Agent Identity and Model Armor](https://youtu.be/PAi7PhUxgTo)
-![Gen AI Evaluation](https://youtu.be/XI4Pj0n1yio)
-![Lyria 3 Pro](https://youtu.be/HlAR7Q210Eg)
+[Sonic Agent](https://youtu.be/pTaZZsaGW5E)
+[Agent Identity and Model Armor](https://youtu.be/PAi7PhUxgTo)
+[Gen AI Evaluation](https://youtu.be/XI4Pj0n1yio)
+[Lyria 3 Pro](https://youtu.be/HlAR7Q210Eg)
 
 # 🛡️ Build a Secure Agent with Model Armor and Identity
 
