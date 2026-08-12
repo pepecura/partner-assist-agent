@@ -366,7 +366,7 @@ cmd = [
     "--region", LOCATION,
     "--otel_to_cloud",
     "--agent_engine_id", agent_engine_id,
-     "agent"
+    "agent"
 ]
 
 print(f"   → Deploying code to Agent Engine: {agent_engine_id}")
